@@ -71,10 +71,10 @@ jobs:
           path: reports/dependency-check-report.html
 
       - name: List generated reports
-          run: |
-            ls -l reports/
-            pwd
-            ls -l
+        run: |
+          ls -l reports/
+          pwd
+          ls -l
 
       - name: Fail on OWASP Vulnerabilities with Threshold
         run: |
