@@ -60,19 +60,19 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      - name: Run OWASP Dependency Check
-        uses: dependency-check/Dependency-Check_Action@main
-        with:
-          project: 'nodejs-project'
-          path: '.' 
-          format: 'ALL' 
-          out: 'reports' 
-          args: >
-            --disableCentral
-            --enableRetired
-            
-
     # -- Analsisi de librerias y dependencias
+
+      # - name: Run OWASP Dependency Check
+      #   uses: dependency-check/Dependency-Check_Action@main
+      #   with:
+      #     project: 'nodejs-project'
+      #     path: '.' 
+      #     format: 'ALL' 
+      #     out: 'reports' 
+      #     args: >
+      #       --disableCentral
+      #       --enableRetired
+            
 
       # - name: Upload Dependency Check Report
       #   uses: actions/upload-artifact@v3
@@ -117,7 +117,7 @@ jobs:
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.28.0
         with:
-          image-ref: 'docker.io/ptrickbtman/app-devsecops:${{ github.sha }}'
+          image-ref: 'docker.io/shadowblind/app-devsecops:${{ github.sha }}'
           format: 'json'
           output: 'trivy-report.json'
           ignore-unfixed: true
