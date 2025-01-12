@@ -93,8 +93,8 @@ jobs:
           max_high=7
 
           # Count vulnerabilities using jq
-          critical=$(jq '.dependencies[].vulnerabilities[] | select(.severity=="CRITICAL")' reports/dependency-check-report.json | wc -l)
-          high=$(jq '.dependencies[].vulnerabilities[] | select(.severity=="HIGH")' reports/dependency-check-report.json | wc -l)
+          critical=$(jq '.dependencies[].vulnerabilities[] | select(.severity=="CRITICAL")' /home/runner/work/laboratorio-final/laboratorio-final/reports/dependency-check-report.json | wc -l)
+          high=$(jq '.dependencies[].vulnerabilities[] | select(.severity=="HIGH")' /home/runner/work/laboratorio-final/laboratorio-final/reports/dependency-check-report.json | wc -l)
 
           # Log the vulnerability counts
           echo "Found $critical critical and $high high vulnerabilities."
