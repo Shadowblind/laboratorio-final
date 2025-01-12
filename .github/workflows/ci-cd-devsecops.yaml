@@ -116,10 +116,10 @@ jobs:
 
 
       - name: List generated reports trivy
-          run: |
-            ls -l reports/
-            pwd
-            ls -l
+        run: |
+          ls -l reports/
+          pwd
+          ls -l
 
       - name: Fail on Trivy Vulnerabilities
           run: |
