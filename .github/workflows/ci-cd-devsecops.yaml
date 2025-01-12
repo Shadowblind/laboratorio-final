@@ -1,0 +1,72 @@
+name: ci-cd-devsecops
+run-name: ${{ github.actor }} Workflow SAST, SCA & Imagen Vuln 🚀
+on:
+  push:
+    branches:
+      - develop 
+
+jobs:
+  AnalisisDeSeguridad:
+    runs-on: "ubuntu-latest"
+    steps:
+      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
+      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+      
+      - name: Debug branch name
+        run: |
+          echo "Full ref: $GITHUB_REF"
+          BRANCH_NAME=$(echo "${GITHUB_REF#refs/heads/}")
+          echo "Branch name: $BRANCH_NAME"
+
+
+      - name: Checkout code
+        uses: actions/checkout@v3 
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16' 
+
+      # - name: Install Dependencies
+      #   run: npm install
+
+      # - name: Run OWASP Dependency Check
+      #   uses: dependency-check/Dependency-Check_Action@main
+      #   with:
+      #     project: 'nodejs-project'
+      #     path: '.' 
+      #     format: 'HTML' 
+      #     out: 'reports' 
+      #     args: >
+      #       --disableCentral
+      #       --enableRetired
+
+      # - name: Upload Dependency Check Report
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: Dependency-Check-Report
+      #     path: reports/dependency-check-report.html
+
+      - name: Analyze with SonarCloud
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  
+        with:
+          args:
+            -Dsonar.projectKey="shadowblind_laboratorio-final"
+            -Dsonar.organization="shadowblind"
+            -Dsonar.branch.name=${{ github.ref_name }}
+          projectBaseDir: .
+
+      
+      # - name: Build an image from Dockerfile
+      #   run: docker build -t docker.io/ptrickbtman/app-devsecops:${{ github.sha }} .
+      # - name: Run Trivy vulnerability scanner
+      #   uses: aquasecurity/trivy-action@0.28.0
+      #   with:
+      #     image-ref: 'docker.io/ptrickbtman/app-devsecops:${{ github.sha }}'
+      #     format: 'table'
+      #     ignore-unfixed: true
+      #     vuln-type: 'os,library'
+      #     severity: 'CRITICAL,HIGH'
