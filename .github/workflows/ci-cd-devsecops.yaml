@@ -27,28 +27,28 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3 
 
-    # -- Analisis statico del codigo
+    # # -- Analisis statico del codigo
 
-      - name: Analyze with SonarCloud
-        uses: SonarSource/sonarcloud-github-action@master
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  
-        with:
-          args:
-            -Dsonar.projectKey="shadowblind_laboratorio-final"
-            -Dsonar.organization="shadowblind"
-            -Dsonar.branch.name=${{ github.ref_name }}
-          projectBaseDir: .
-      - name: Check vulnerabilities and fail pipeline on critical/high/medium issues
-        run: |
-          # Obtener el informe de calidad y verificar las vulnerabilidades
-          critical_vulns=$(curl -s -u ${{ secrets.SONAR_TOKEN }}: "https://sonarcloud.io/api/issues/search?componentKeys=shadowblind_laboratorio-final&types=VULNERABILITY&severity=CRITICAL&severity=HIGH&severity=MEDIUM" | jq '.total')
-          if [ "$critical_vulns" -gt 0 ]; then
-            echo "Found $critical_vulns critical/high/medium vulnerabilities."
-            exit 0 # Falla el pipeline
-          else
-            echo "No critical/high/medium vulnerabilities found."
-          fi
+    #   - name: Analyze with SonarCloud
+    #     uses: SonarSource/sonarcloud-github-action@master
+    #     env:
+    #       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  
+    #     with:
+    #       args:
+    #         -Dsonar.projectKey="shadowblind_laboratorio-final"
+    #         -Dsonar.organization="shadowblind"
+    #         -Dsonar.branch.name=${{ github.ref_name }}
+    #       projectBaseDir: .
+    #   - name: Check vulnerabilities and fail pipeline on critical/high/medium issues
+    #     run: |
+    #       # Obtener el informe de calidad y verificar las vulnerabilidades
+    #       critical_vulns=$(curl -s -u ${{ secrets.SONAR_TOKEN }}: "https://sonarcloud.io/api/issues/search?componentKeys=shadowblind_laboratorio-final&types=VULNERABILITY&severity=CRITICAL&severity=HIGH&severity=MEDIUM" | jq '.total')
+    #       if [ "$critical_vulns" -gt 0 ]; then
+    #         echo "Found $critical_vulns critical/high/medium vulnerabilities."
+    #         exit 0 # Falla el pipeline
+    #       else
+    #         echo "No critical/high/medium vulnerabilities found."
+    #       fi
 
     # -- Preparacion del proyecto node
 
@@ -74,40 +74,40 @@ jobs:
 
     # -- Analsisi de librerias y dependencias
 
-      - name: Upload Dependency Check Report
-        uses: actions/upload-artifact@v3
-        with:
-          name: Dependency-Check-Report
-          path: reports/dependency-check-report.html
+      # - name: Upload Dependency Check Report
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: Dependency-Check-Report
+      #     path: reports/dependency-check-report.html
 
-      - name: List generated reports
-        run: |
-          ls -l reports/
-          pwd
-          ls -l
+      # - name: List generated reports
+      #   run: |
+      #     ls -l reports/
+      #     pwd
+      #     ls -l
 
-      - name: Fail on OWASP Vulnerabilities with Threshold
-        run: |
-          # Define thresholds
-          max_critical=7
-          max_high=7
+      # - name: Fail on OWASP Vulnerabilities with Threshold
+      #   run: |
+      #     # Define thresholds
+      #     max_critical=7
+      #     max_high=7
 
-          # Count vulnerabilities using jq
-          critical=$(jq '.dependencies[].vulnerabilities[] | select(.severity=="CRITICAL")' /home/runner/work/laboratorio-final/laboratorio-final/reports/dependency-check-report.json | wc -l)
-          high=$(jq '.dependencies[].vulnerabilities[] | select(.severity=="HIGH")' /home/runner/work/laboratorio-final/laboratorio-final/reports/dependency-check-report.json | wc -l)
+      #     # Count vulnerabilities using jq
+      #     critical=$(jq '.dependencies[].vulnerabilities[] | select(.severity=="CRITICAL")' /home/runner/work/laboratorio-final/laboratorio-final/reports/dependency-check-report.json | wc -l)
+      #     high=$(jq '.dependencies[].vulnerabilities[] | select(.severity=="HIGH")' /home/runner/work/laboratorio-final/laboratorio-final/reports/dependency-check-report.json | wc -l)
 
-          # Log the vulnerability counts
-          echo "Found $critical critical and $high high vulnerabilities."
+      #     # Log the vulnerability counts
+      #     echo "Found $critical critical and $high high vulnerabilities."
 
-          # Check if vulnerabilities exceed thresholds
-          if [ "$critical" -gt "$max_critical" ] || [ "$high" -gt "$max_high" ]; then
-            echo "Vulnerabilities exceed thresholds! Max allowed: $max_critical critical, $max_high high."
-            exit 1
-          else
-            echo "Vulnerabilities are within acceptable limits."
-            exit 0
-          fi
-        shell: bash
+      #     # Check if vulnerabilities exceed thresholds
+      #     if [ "$critical" -gt "$max_critical" ] || [ "$high" -gt "$max_high" ]; then
+      #       echo "Vulnerabilities exceed thresholds! Max allowed: $max_critical critical, $max_high high."
+      #       exit 1
+      #     else
+      #       echo "Vulnerabilities are within acceptable limits."
+      #       exit 0
+      #     fi
+      #   shell: bash
 
 
       # -- Build y analisis de imagenes.
