@@ -122,13 +122,13 @@ jobs:
           ls -l
 
       - name: Fail on Trivy Vulnerabilities
-          run: |
-            critical=$(jq '[.Results[].Vulnerabilities[] | select(.Severity=="CRITICAL")] | length' trivy-report.json)
-            high=$(jq '[.Results[].Vulnerabilities[] | select(.Severity=="HIGH")] | length' trivy-report.json)
-            if [ "$critical" -gt 0 ] || [ "$high" -gt 0 ]; then
-              echo "Found $critical critical and $high high vulnerabilities."
-              exit 1
-            else
-              echo "No critical or high vulnerabilities found."
-            fi
-          shell: bash
+        run: |
+          critical=$(jq '[.Results[].Vulnerabilities[] | select(.Severity=="CRITICAL")] | length' trivy-report.json)
+          high=$(jq '[.Results[].Vulnerabilities[] | select(.Severity=="HIGH")] | length' trivy-report.json)
+          if [ "$critical" -gt 0 ] || [ "$high" -gt 0 ]; then
+            echo "Found $critical critical and $high high vulnerabilities."
+            exit 1
+          else
+            echo "No critical or high vulnerabilities found."
+          fi
+        shell: bash
