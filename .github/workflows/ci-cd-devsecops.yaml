@@ -57,8 +57,8 @@ jobs:
         with:
           node-version: '16' 
 
-      - name: Install Dependencies
-        run: npm install
+      # - name: Install Dependencies
+      #   run: npm install
 
     # -- Analsisi de librerias y dependencias
 
@@ -123,13 +123,10 @@ jobs:
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
+      
 
-
-      - name: List generated reports trivy
-        run: |
-          ls -l reports/
-          pwd
-          ls -l
+      - name: get files
+        run: ls -l
 
       - name: Fail on Trivy Vulnerabilities
         run: |
