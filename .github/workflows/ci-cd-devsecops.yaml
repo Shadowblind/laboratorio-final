@@ -3,7 +3,7 @@ run-name: ${{ github.actor }} Workflow SAST, SCA & Imagen Vuln 🚀
 on:
   push:
     branches:
-      - main 
+      - develop 
 
 jobs:
   AnalisisDeSeguridad:
