@@ -55,7 +55,7 @@ jobs:
         with:
           project: 'nodejs-project'
           path: '.' 
-          format: 'HTML' 
+          format: 'JSON,HTML' 
           out: 'reports' 
           args: >
             --disableCentral
