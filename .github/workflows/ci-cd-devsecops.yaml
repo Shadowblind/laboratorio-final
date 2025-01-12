@@ -9,6 +9,9 @@ jobs:
   AnalisisDeSeguridad:
     runs-on: "ubuntu-latest"
     steps:
+
+    # -- Informacion del proyecto general
+
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
       - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
       - run: echo "🔎 The name of your branch is  ${{ github.ref }} and your repository is ${{ github.repository }}."
@@ -19,10 +22,26 @@ jobs:
           BRANCH_NAME=$(echo "${GITHUB_REF#refs/heads/}")
           echo "Branch name: $BRANCH_NAME"
 
+    # -- Clonacion del proyecto
 
       - name: Checkout code
         uses: actions/checkout@v3 
-      
+
+    # -- Analisis statico del codigo
+
+      - name: Analyze with SonarCloud
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  
+        with:
+          args:
+            -Dsonar.projectKey="shadowblind_laboratorio-final"
+            -Dsonar.organization="shadowblind"
+            -Dsonar.branch.name=${{ github.ref_name }}
+          projectBaseDir: .
+    
+    # -- Preparacion del proyecto node
+
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
@@ -41,6 +60,9 @@ jobs:
           args: >
             --disableCentral
             --enableRetired
+            
+
+    # -- Analsisi de librerias y dependencias
 
       - name: Upload Dependency Check Report
         uses: actions/upload-artifact@v3
@@ -48,17 +70,32 @@ jobs:
           name: Dependency-Check-Report
           path: reports/dependency-check-report.html
 
-      - name: Analyze with SonarCloud
-        uses: SonarSource/sonarcloud-github-action@master
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  
-        with:
-          args:
-            -Dsonar.projectKey="shadowblind_laboratorio-final"
-            -Dsonar.organization="shadowblind"
-            -Dsonar.branch.name=${{ github.ref_name }}
-          projectBaseDir: .
 
+      - name: Fail on OWASP Vulnerabilities with Threshold
+        run: |
+          # Define thresholds
+          max_critical=7
+          max_high=7
+
+          # Count vulnerabilities using jq
+          critical=$(jq '.dependencies[].vulnerabilities[] | select(.severity=="CRITICAL")' reports/dependency-check-report.json | wc -l)
+          high=$(jq '.dependencies[].vulnerabilities[] | select(.severity=="HIGH")' reports/dependency-check-report.json | wc -l)
+
+          # Log the vulnerability counts
+          echo "Found $critical critical and $high high vulnerabilities."
+
+          # Check if vulnerabilities exceed thresholds
+          if [ "$critical" -gt "$max_critical" ] || [ "$high" -gt "$max_high" ]; then
+            echo "Vulnerabilities exceed thresholds! Max allowed: $max_critical critical, $max_high high."
+            exit 1
+          else
+            echo "Vulnerabilities are within acceptable limits."
+            exit 0
+          fi
+        shell: bash
+
+
+      # -- Build y analisis de imagenes.
       
       - name: Build an image from Dockerfile
         run: docker build -t docker.io/ptrickbtman/app-devsecops:${{ github.sha }} .
